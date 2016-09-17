@@ -4,7 +4,7 @@ from rest_framework import routers
 
 from blog.views import BlogViewSet, AuthorViewSet, EntryViewSet
 
-router = routers.DefaultRouter()
+router = routers.DefaultRouter(trailing_slash=False)
 router.register(r'blogs', BlogViewSet)
 router.register(r'authors', AuthorViewSet)
 router.register(r'entries', EntryViewSet)

@@ -9,7 +9,6 @@ from .fixtures import *
 
 
 class AuthorTestCase(APITestCase):
-
     def setUp(self):
         super(AuthorTestCase, self).setUp()
         self.author = AuthorFactory(name='Author 1', email='author1@email.com')
@@ -195,7 +194,6 @@ class AuthorTestCase(APITestCase):
 
 
 class EntryTestCase(APITestCase):
-
     def setUp(self):
         super(EntryTestCase, self).setUp()
         self.blog = BlogFactory()
