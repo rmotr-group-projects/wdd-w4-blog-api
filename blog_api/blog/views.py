@@ -8,21 +8,29 @@ from blog.serializers import *
 class AuthorsView(mixins.CreateModelMixin, 
                   mixins.ListModelMixin,
                   mixins.RetrieveModelMixin,
+                  mixins.UpdateModelMixin,
+                  mixins.DestroyModelMixin,
                   viewsets.GenericViewSet):
     queryset = Author.objects.all()
+    filter_backends = (filters.SearchFilter, filters.OrderingFilter)
     serializer_class = AuthorSerializer
-    # permission_classes = (IsAdminUser,)
+    search_fields = ('name', 'email', 'nationality')
+    ordering_fields = ('name', 'email', 'nationality', 'id')
     
 class EntryView(mixins.CreateModelMixin, 
                   mixins.ListModelMixin,
                   mixins.RetrieveModelMixin,
+                  mixins.UpdateModelMixin,
+                  mixins.DestroyModelMixin,
                   viewsets.GenericViewSet):
     queryset = Entry.objects.all()
     serializer_class = EntrySerializer
 
 class BlogView(mixins.CreateModelMixin, 
                   mixins.ListModelMixin,
-                #   mixins.RetrieveModelMixin,
+                  mixins.RetrieveModelMixin,
+                  mixins.UpdateModelMixin,
+                  mixins.DestroyModelMixin,
                   viewsets.GenericViewSet):
     queryset = Blog.objects.all()
     serializer_class = BlogSerializer
