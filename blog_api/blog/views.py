@@ -1,20 +1,20 @@
 from rest_framework import viewsets, mixins, filters
 
 from blog.models import Author, Entry, Blog
-from blog.serializers import *
+from blog.serializers import BlogSerializer, AuthorSerializer, EntrySerializer
 
 
 # implement Views here
 class BlogViewSet(viewsets.ModelViewSet):
     queryset = Blog.objects.all()
-    serializer_class = None
+    serializer_class = BlogSerializer
 
 
 class AuthorViewSet(viewsets.ModelViewSet):
     queryset = Author.objects.all()
-    serializer_class = None
+    serializer_class = AuthorSerializer
 
 
 class EntryViewSet(viewsets.ModelViewSet):
     queryset = Entry.objects.all()
-    serializer_class = None
+    serializer_class = EntrySerializer
