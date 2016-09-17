@@ -1,5 +1,6 @@
 import json
 from datetime import date
+import ipdb
 
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -36,7 +37,8 @@ class AuthorTestCase(APITestCase):
                 }
             ]
         }
-        response = self.client.get('/api/authors')
+        # ; ipdb.set_trace() # n-> next, q-> quit, c-> continue
+        response = self.client.get('/api/authors') #, follow=True
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json(), expected)
 
