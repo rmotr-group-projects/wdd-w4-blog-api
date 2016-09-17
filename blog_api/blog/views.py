@@ -13,6 +13,9 @@ class BlogViewSet(viewsets.ModelViewSet):
 class AuthorViewSet(viewsets.ModelViewSet):
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
+    filter_backends = (filters.SearchFilter, filters.OrderingFilter,)
+    search_fields = ('name',)
+    ordering_fields = ('username', 'email')
 
 
 class EntryViewSet(viewsets.ModelViewSet):

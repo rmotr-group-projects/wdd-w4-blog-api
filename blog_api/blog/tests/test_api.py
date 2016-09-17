@@ -13,6 +13,7 @@ class AuthorTestCase(APITestCase):
         super(AuthorTestCase, self).setUp()
         self.author = AuthorFactory(name='Author 1', email='author1@email.com')
         self.author_2 = AuthorFactory(name='Author 2', email='author2@email.com')
+        self.maxDiff = None
 
     def test_list(self):
         """Should return a list of all authors"""
