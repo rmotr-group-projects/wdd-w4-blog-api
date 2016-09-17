@@ -359,3 +359,35 @@ class BlogTestCase(APITestCase):
         self.assertEqual(Blog.objects.count(), 3)
         blog = Blog.objects.get(name='Blog 3')
         self.assertEqual(blog.tagline, 'best tagline')
+
+    def test_full_update(self):
+        """Should full update an entry when given data is valid"""
+        payload = {
+            'name': 'new blog',
+            'tagline': 'new tagline'
+        }
+        response = self.client.put(
+            '/api/blogs/{}'.format(self.blog.id), payload)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        blog = Blog.objects.get(id=self.blog.id)
+        self.assertEqual(blog.name, 'new blog')
+
+    def test_partial_update(self):
+        """Should partial update an entry when given data is valid"""
+        payload = {
+            'tagline': 'new tagline',
+        }
+        response = self.client.patch(
+            '/api/blogs/{}'.format(self.blog.id), payload)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        blog = Blog.objects.get(id=self.blog.id)
+        self.assertEqual(blog.tagline, 'new tagline')
+
+    def test_delete(self):
+        """Should delete author when given id is valid"""
+        self.assertEqual(Blog.objects.count(), 2)
+        response = self.client.delete('/api/blogs/{}'.format(self.blog.id))
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Blog.objects.count(), 1)
+        with self.assertRaises(Blog.DoesNotExist):
+            Blog.objects.get(id=self.blog.id)
