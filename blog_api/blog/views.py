@@ -15,7 +15,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
     serializer_class = AuthorSerializer
     filter_backends = (filters.SearchFilter, filters.OrderingFilter,)
     search_fields = ('name',)
-    ordering_fields = ('username', 'email')
+    ordering_fields = ('id', '-id')
 
 
 class EntryViewSet(viewsets.ModelViewSet):
