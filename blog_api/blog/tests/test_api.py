@@ -1,6 +1,5 @@
 import json
 from datetime import date
-import ipdb
 
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -37,8 +36,7 @@ class AuthorTestCase(APITestCase):
                 }
             ]
         }
-        # ; ipdb.set_trace() # n-> next, q-> quit, c-> continue
-        response = self.client.get('/api/authors') #, follow=True
+        response = self.client.get('/api/authors')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json(), expected)
 
@@ -326,3 +324,92 @@ class EntryTestCase(APITestCase):
         self.assertEqual(Entry.objects.count(), 1)
         with self.assertRaises(Entry.DoesNotExist):
             Entry.objects.get(id=self.entry.id)
+            
+class BlogTestCase(APITestCase):
+
+    def setUp(self):
+        super(BlogTestCase, self).setUp()
+        self.blog = BlogFactory(name="Blog 1", tagline="Some tagline")
+        self.blog_2 = BlogFactory(name="Blog 2", tagline="Some tagline")
+        self.maxDiff = None
+
+    def test_list(self):
+        """Should return a list of all blogs"""
+        expected =   {
+                    "count": 2,
+                    "next": None,
+                    "previous": None,
+                    "results": [
+                {
+                    "url": "http://testserver/api/blogs/1",
+                    "name": "Blog 1",
+                    "tagline": "Some tagline"
+                },
+                {
+                    "url": "http://testserver/api/blogs/2",
+                    "name": "Blog 2",
+                    "tagline": "Some tagline"
+                }
+            ]
+        }
+        response = self.client.get('/api/blogs')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json(), expected)
+
+    def test_detail(self):
+        """Should return the detail of given blog"""
+        expected = {
+            "url": "http://testserver/api/blogs/1",
+            "name": "Blog 1",
+            "tagline": "Some tagline"
+        }
+        response = self.client.get('/api/blogs/{}'.format(self.blog.id))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json(), expected)
+
+    def test_create(self):
+        """Should create a new blog when given data is valid"""
+        self.assertEqual(Blog.objects.count(), 2)
+        payload = {
+            'name': 'Blog 3',
+            'tagline': 'Some other tagline',
+        }
+        response = self.client.post('/api/blogs', data=payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Blog.objects.count(), 3)
+        blog = Blog.objects.get(name='Blog 3')
+        self.assertEqual(blog.tagline, 'Some other tagline')
+
+    def test_full_update(self):
+        """Should full update an blog when given data is valid"""
+        payload = {
+            'name': 'Seinfelds Blog',
+            'tagline': 'A blog about nothing',
+        }
+        response = self.client.put(
+            '/api/blogs/{}'.format(self.blog.id), payload)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        blog = Blog.objects.get(id=self.blog.id)
+        self.assertEqual(blog.name, 'Seinfelds Blog')
+        self.assertEqual(blog.tagline, 'A blog about nothing')
+
+    def test_partial_update(self):
+        """Should partial update an blog when given data is valid"""
+        payload = {
+            'tagline': 'A blog about something',
+        }
+        response = self.client.patch(
+            '/api/blogs/{}'.format(self.blog.id), payload)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        blog = Blog.objects.get(id=self.blog.id)
+        self.assertEqual(blog.tagline, 'A blog about something')
+
+    def test_delete(self):
+        """Should delete blog when given id is valid"""
+        self.assertEqual(Blog.objects.count(), 2)
+        response = self.client.delete('/api/blogs/{}'.format(self.blog.id))
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Blog.objects.count(), 1)
+        with self.assertRaises(Blog.DoesNotExist):
+            Blog.objects.get(id=self.blog.id)
+
