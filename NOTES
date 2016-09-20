@@ -1,0 +1,12 @@
+Done:
+
+ 1. Add djangorestframework to requirements/base.txt
+ 2. Set up virtualenvs, install requirements on both, and set activate/postactivate scripts
+ 3. Add rest-framework to INSTALLED_APPS and add REST_FRAMEWORK setting
+ 4. Add a view and serializer for each resource (blogs, authors, entries)
+ 5. Add a url router, register an endpoint for each resource, and include the router urls in the urlpatterns list
+ 6. Configure filter backend for search on author model name field
+ 7. Configure filter backend for ordering on author model id field
+
+To do:
+ 3. Create tests for the /blogs endpoint

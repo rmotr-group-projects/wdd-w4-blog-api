@@ -6,7 +6,7 @@ os:
 
 python:
   - "2.7"
-  - "3.3"
+  # - "3.3" # Django 1.9 requires Python 2.7+ or 3.4+
   - "3.4"
   - "3.5"
 
