@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 from django.db import models
 
-
 COUNTRY_CHOICES = (
     ('ar', 'Argentina'),
     ('us', 'United States'),

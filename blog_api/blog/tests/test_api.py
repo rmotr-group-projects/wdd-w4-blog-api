@@ -4,16 +4,16 @@ from datetime import date
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from blog.models import Author
+from blog.models import Author, Blog
 from .fixtures import *
 
 
 class AuthorTestCase(APITestCase):
-
     def setUp(self):
         super(AuthorTestCase, self).setUp()
         self.author = AuthorFactory(name='Author 1', email='author1@email.com')
         self.author_2 = AuthorFactory(name='Author 2', email='author2@email.com')
+        self.maxDiff = None
 
     def test_list(self):
         """Should return a list of all authors"""
@@ -195,7 +195,6 @@ class AuthorTestCase(APITestCase):
 
 
 class EntryTestCase(APITestCase):
-
     def setUp(self):
         super(EntryTestCase, self).setUp()
         self.blog = BlogFactory()
@@ -324,3 +323,71 @@ class EntryTestCase(APITestCase):
         self.assertEqual(Entry.objects.count(), 1)
         with self.assertRaises(Entry.DoesNotExist):
             Entry.objects.get(id=self.entry.id)
+
+
+class BlogTestCase(APITestCase):
+    def setUp(self):
+        super(BlogTestCase, self).setUp()
+        self.blog = BlogFactory()
+        self.blog_2 = BlogFactory()
+        self.maxDiff = None
+
+    def test_list(self):
+        response = self.client.get('/api/blogs')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()['count'], 2)
+
+    def test_detail(self):
+        response = self.client.get('/api/blogs/{}'.format(self.blog.id))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()['name'], self.blog.name)
+        self.assertIn('url', response.json())
+        self.assertIn('tagline', response.json())
+
+    def test_detail_not_found_id(self):
+        response = self.client.get('/api/blogs/{}'.format('foobar'))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_create(self):
+        self.assertEqual(Blog.objects.count(), 2)
+        payload = {
+            'name': 'Blog 3',
+            'tagline': 'best tagline'
+        }
+        response = self.client.post('/api/blogs', payload)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Blog.objects.count(), 3)
+        blog = Blog.objects.get(name='Blog 3')
+        self.assertEqual(blog.tagline, 'best tagline')
+
+    def test_full_update(self):
+        """Should full update an entry when given data is valid"""
+        payload = {
+            'name': 'new blog',
+            'tagline': 'new tagline'
+        }
+        response = self.client.put(
+            '/api/blogs/{}'.format(self.blog.id), payload)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        blog = Blog.objects.get(id=self.blog.id)
+        self.assertEqual(blog.name, 'new blog')
+
+    def test_partial_update(self):
+        """Should partial update an entry when given data is valid"""
+        payload = {
+            'tagline': 'new tagline',
+        }
+        response = self.client.patch(
+            '/api/blogs/{}'.format(self.blog.id), payload)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        blog = Blog.objects.get(id=self.blog.id)
+        self.assertEqual(blog.tagline, 'new tagline')
+
+    def test_delete(self):
+        """Should delete author when given id is valid"""
+        self.assertEqual(Blog.objects.count(), 2)
+        response = self.client.delete('/api/blogs/{}'.format(self.blog.id))
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Blog.objects.count(), 1)
+        with self.assertRaises(Blog.DoesNotExist):
+            Blog.objects.get(id=self.blog.id)
